@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "chatroom.h": "c",
+        "unistd.h": "c",
+        "pthread.h": "c"
+    }
+}
