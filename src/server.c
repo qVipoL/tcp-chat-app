@@ -1,17 +1,17 @@
+#include <arpa/inet.h>
+#include <pthread.h>
+#include <signal.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <string.h>
-#include <signal.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <stdint.h>
 #include <sys/socket.h>
-#include <arpa/inet.h>
+#include <unistd.h>
 
 #include "../include/chatroom/chatroom.h"
-#include "../include/user/user.h"
 #include "../include/error/error.h"
+#include "../include/user/user.h"
 
 #define BUFFER_SIZE 256
 #define MAX_PENDING 10
@@ -27,8 +27,7 @@ int register_chatroom(long sd, int user_idx);
 void *handle_client(void *_sd);
 bool parse_input(char *input_buffer, char *output_buffer);
 
-int main()
-{
+int main() {
     long sd, client_sd;
     int return_code;
     pthread_t client_thread;
@@ -50,12 +49,10 @@ int main()
 
     exit_with_error("unable to listen socket.\n", listen(sd, MAX_PENDING), -1);
 
-    while (alive)
-    {
+    while (alive) {
         client_sd = accept(sd, 0, 0);
 
-        if (client_sd == -1)
-        {
+        if (client_sd == -1) {
             perror("unable to accept incoming connection.\n");
             alive = false;
             break;
@@ -63,8 +60,7 @@ int main()
 
         return_code = pthread_create(&client_thread, NULL, &handle_client, (void *)client_sd);
 
-        if (return_code == 0)
-        {
+        if (return_code == 0) {
             perror("unable to create new thread.\n");
             close(client_sd);
             alive = false;
@@ -76,8 +72,7 @@ int main()
     return 0;
 }
 
-int register_user(long sd)
-{
+int register_user(long sd) {
     size_t bytes_recieved = 0;
     int user_idx;
     char error_buffer[BUFFER_SIZE], in_buffer[BUFFER_SIZE];
@@ -93,8 +88,7 @@ int register_user(long sd)
     return user_idx;
 }
 
-int register_chatroom(long sd, int user_idx)
-{
+int register_chatroom(long sd, int user_idx) {
     size_t bytes_recieved = 0;
     int room_idx;
     char error_buffer[BUFFER_SIZE], in_buffer[BUFFER_SIZE];
@@ -110,8 +104,7 @@ int register_chatroom(long sd, int user_idx)
     return room_idx;
 }
 
-void *handle_client(void *_sd)
-{
+void *handle_client(void *_sd) {
     char in_buffer[BUFFER_SIZE], out_buffer[BUFFER_SIZE];
     size_t bytes_recieved = 0;
     int user_idx, room_idx;
@@ -132,13 +125,11 @@ void *handle_client(void *_sd)
     snprintf(out_buffer, BUFFER_SIZE, "%s connected.\n", users[user_idx].name);
     chatroom_send(user_idx, room_idx, out_buffer);
 
-    while (alive)
-    {
+    while (alive) {
         memset(in_buffer, 0, BUFFER_SIZE);
         bytes_recieved = recv(sd, in_buffer, BUFFER_SIZE - 1, 0);
 
-        if (bytes_recieved > 0)
-        {
+        if (bytes_recieved > 0) {
             if (!parse_input(in_buffer, out_buffer))
                 break;
 
@@ -157,8 +148,7 @@ void *handle_client(void *_sd)
     return NULL;
 }
 
-bool parse_input(char *in_buffer, char *out_buffer)
-{
+bool parse_input(char *in_buffer, char *out_buffer) {
     if (strncmp(in_buffer, "exit", 4) == 0)
         return false;
 
