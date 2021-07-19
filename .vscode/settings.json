@@ -2,6 +2,14 @@
     "files.associations": {
         "chatroom.h": "c",
         "unistd.h": "c",
-        "pthread.h": "c"
+        "pthread.h": "c",
+        "user.h": "c",
+        "stdlib.h": "c",
+        "stdint.h": "c",
+        "inet.h": "c",
+        "socket.h": "c",
+        "error.h": "c",
+        "stdio.h": "c",
+        "stdbool.h": "c"
     }
 }

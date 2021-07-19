@@ -1,11 +1,12 @@
-#include "chatroom.h"
+#include "../../include/chatroom.h"
 
 #include <pthread.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/socket.h>
 
-#include "../user/user.h"
+#include "../../include/user.h"
+#define BUFFER_SIZE 256
 
 static chatroom rooms[MAX_ROOMS];
 
@@ -105,17 +106,13 @@ void chatroom_send(int user_idx, int chatroom_idx, const char *msg) {
 
     users = get_users();
 
-    pthread_mutex_lock(&rooms_mutex);
-
     room = rooms[chatroom_idx];
 
     for (i = 0; i < MAX_USERS_PER_ROOM; i++) {
-        if (room.users_idxs[i] != user_idx) {
+        if (room.users_idxs[i] != INVALID_USER && room.users_idxs[i] != user_idx) {
             idx = room.users_idxs[i];
 
             send(users[idx].sd, msg, strlen(msg), 0);
         }
     }
-
-    pthread_mutex_unlock(&rooms_mutex);
 }

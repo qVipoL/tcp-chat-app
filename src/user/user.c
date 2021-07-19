@@ -1,10 +1,11 @@
-#include "user.h"
+
+#include "../../include/user.h"
 
 #include <pthread.h>
 #include <stdio.h>
 #include <string.h>
 
-#include "../error/error.h"
+#include "../../include/error.h"
 
 static user users[MAX_USERS];
 
