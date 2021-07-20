@@ -1,5 +1,4 @@
-
-#include "../../include/user.h"
+#include "include/user.h"
 
 static user users[MAX_USERS];
 

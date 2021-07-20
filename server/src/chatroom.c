@@ -1,7 +1,7 @@
-#include "../../include/chatroom.h"
+#include "include/chatroom.h"
 
-#include "../../include/tcp.h"
-#include "../../include/user.h"
+#include "include/tcp.h"
+#include "include/user.h"
 
 static chatroom rooms[MAX_ROOMS];
 

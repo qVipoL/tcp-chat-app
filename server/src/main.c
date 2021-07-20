@@ -1,6 +1,6 @@
-#include "../include/chatroom.h"
-#include "../include/tcp.h"
-#include "../include/user.h"
+#include "include/chatroom.h"
+#include "include/tcp.h"
+#include "include/user.h"
 
 static bool alive = true;
 

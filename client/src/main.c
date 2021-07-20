@@ -1,4 +1,4 @@
-#include "../include/tcp.h"
+#include "include/tcp.h"
 
 static bool alive = true;
 

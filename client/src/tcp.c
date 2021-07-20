@@ -1,4 +1,4 @@
-#include "../../include/tcp.h"
+#include "include/tcp.h"
 
 long socket_init() {
     long sd;
@@ -11,29 +11,6 @@ long socket_init() {
     }
 
     return sd;
-}
-
-void server_set_addr(sa_in *addr, int port) {
-    memset(addr, 0, sizeof(sa_in));
-    addr->sin_family = AF_INET;
-    addr->sin_addr.s_addr = htonl(INADDR_ANY);
-    addr->sin_port = htons(port);
-}
-
-void server_socket_bind(long sd, sa_in addr) {
-    if (bind(sd, (sa *)&addr, sizeof(sa_in)) == -1) {
-        perror("failed to bind socket.\n");
-        close(sd);
-        exit(1);
-    }
-}
-
-void server_socket_listen(long sd) {
-    if (listen(sd, MAX_PENDING) == -1) {
-        perror("failed to listen socket.\n");
-        close(sd);
-        exit(1);
-    }
 }
 
 void client_set_addr(sa_in *addr, char *ip, int port) {
