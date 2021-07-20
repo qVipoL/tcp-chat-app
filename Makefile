@@ -2,18 +2,21 @@ CC := gcc
 FLAGS := -g -pthread -Wall
 BUILD := bin
 SOURCE := src
-INCLUDE := include
 
 all: build server client 
 
 build:
 	@mkdir -p $(BUILD)
 
-client: $(SOURCE)/client.c $(SOURCE)/error/error.c
-	$(CC) $(FLAGS) $(SOURCE)/client.c $(SOURCE)/error/error.c -o $(BUILD)/client
+client: $(SOURCE)/client.c $(SOURCE)/tcp/tcp.c
+	$(CC) $(FLAGS) $^ -o $(BUILD)/client
 
-server: $(SOURCE)/server.c $(SOURCE)/chatroom/chatroom.c $(SOURCE)/error/error.c $(SOURCE)/user/user.c
-	$(CC) $(FLAGS) $(SOURCE)/server.c $(SOURCE)/chatroom/chatroom.c $(SOURCE)/error/error.c $(SOURCE)/user/user.c -o $(BUILD)/server
+server: $(SOURCE)/server.c $(SOURCE)/chatroom/chatroom.c $(SOURCE)/user/user.c $(SOURCE)/tcp/tcp.c
+	$(CC) $(FLAGS) $^ -o $(BUILD)/server
+
+run:
+	gnome-terminal -- "./bin/server" -t "Server"
+	gnome-terminal -- "./bin/client" -t "Client 1"
 
 clean:
 	rm $(BUILD_DIR)/*

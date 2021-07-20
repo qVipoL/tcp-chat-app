@@ -1,57 +1,55 @@
 
 #include "../../include/user.h"
 
-#include <pthread.h>
-#include <stdio.h>
-#include <string.h>
-
-#include "../../include/error.h"
-
 static user users[MAX_USERS];
 
 static pthread_mutex_t users_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-bool user_init() {
-    int i;
+void user_init() {
+    int idx;
 
-    for (i = 0; i < MAX_USERS; i++) {
-        users[i].connected = false;
-        users[i].sd = -1;
-        users[i].name[0] = '\0';
+    for (idx = 0; idx < MAX_USERS; idx++) {
+        users[idx].connected = false;
+        users[idx].sd = -1;
+        users[idx].name[0] = '\0';
     }
-
-    return true;
 }
 
 int user_login(const char *client_name, int sd, char *error_buffer, int error_buffer_size) {
-    int i;
+    int idx, name_length;
 
-    if (strlen(client_name) > MAX_NAME_LENGTH) {
+    name_length = strlen(client_name);
+
+    if (name_length > MAX_NAME_LENGTH) {
         snprintf(error_buffer, error_buffer_size, "username too long (max: %d chars).\n", MAX_NAME_LENGTH);
+
+        return INVALID_USER;
+    } else if (name_length < MIN_NAME_LENGTH) {
+        snprintf(error_buffer, error_buffer_size, "username too short (min: %d chars).\n", MIN_NAME_LENGTH);
 
         return INVALID_USER;
     }
 
     pthread_mutex_lock(&users_mutex);
 
-    for (i = 0; i < MAX_USERS; i++)
-        if (!users[i].connected)
+    for (idx = 0; idx < MAX_USERS; idx++)
+        if (!users[idx].connected)
             break;
 
-    if (i >= MAX_USERS) {
+    if (idx >= MAX_USERS) {
         pthread_mutex_unlock(&users_mutex);
         strncpy(error_buffer, "chat server is full.\n", error_buffer_size - 1);
 
         return INVALID_USER;
     }
 
-    users[i].connected = true;
-    users[i].sd = sd;
-    strncpy(users[i].name, client_name, MAX_NAME_LENGTH);
+    users[idx].connected = true;
+    users[idx].sd = sd;
+    strncpy(users[idx].name, client_name, MAX_NAME_LENGTH);
 
     pthread_mutex_unlock(&users_mutex);
 
-    return i;
+    return idx;
 }
 
 void user_logout(int user_idx) {
@@ -60,22 +58,6 @@ void user_logout(int user_idx) {
     users[user_idx].connected = false;
     users[user_idx].sd = -1;
     users[user_idx].name[0] = '\0';
-
-    pthread_mutex_unlock(&users_mutex);
-}
-
-void user_remove_connections(int sd) {
-    int i;
-
-    pthread_mutex_lock(&users_mutex);
-
-    for (i = 0; i < MAX_USERS; i++) {
-        if (users[i].sd == sd) {
-            users[i].connected = false;
-            users[i].sd = -1;
-            users[i].name[0] = 0;
-        }
-    }
 
     pthread_mutex_unlock(&users_mutex);
 }

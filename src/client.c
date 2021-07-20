@@ -1,70 +1,53 @@
-#include <arpa/inet.h>
-#include <pthread.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <unistd.h>
-
-#include "../include/error.h"
-
-#define BUFFER_SIZE 256
-#define PORT 8087
-#define ADDRESS "127.0.0.1"
+#include "../include/tcp.h"
 
 static bool alive = true;
 
-typedef struct sockaddr_in sa_in;
-typedef struct sockaddr sa;
-
-bool server_send(long sd);
-void *server_listen(void *_sd);
+static void client_start(long sd);
+static bool server_send(long sd);
+static void *server_recieve(void *_sd);
+static void read_input(char *buffer, int buffer_size);
+static void overwrite_stdout();
 
 int main() {
-    long server_sd;
-    int return_code;
-    sa_in server_addr;
-    pthread_t listen_thread;
+    long sd;
+    sa_in other_addr;
 
-    server_sd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+    sd = socket_init();
 
-    exit_with_error("unable to initialize socket.\n", server_sd, -1);
+    client_set_addr(&other_addr, ADDRESS, PORT);
 
-    memset(&server_addr, 0, sizeof(sa_in));
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_addr.s_addr = inet_addr(ADDRESS);
-    server_addr.sin_port = htons(PORT);
+    client_socket_connect(sd, other_addr);
 
-    if (connect(server_sd, (sa *)&server_addr, sizeof(server_addr)) == -1) {
-        perror("unable to connect to server.\n");
-        close(server_sd);
-        exit(1);
-    }
+    client_start(sd);
 
-    return_code = pthread_create(&listen_thread, NULL, server_listen, (void *)server_sd);
-
-    exit_with_error("unable to create new thread.\n", return_code, -1);
-
-    if (!server_send(server_sd)) {
-        perror("failed.\n");
-        close(server_sd);
-        exit(1);
-    }
-
-    close(server_sd);
+    close(sd);
     return 0;
 }
 
-bool server_send(long sd) {
+static void client_start(long sd) {
+    pthread_t recv_thread;
+
+    if (pthread_create(&recv_thread, NULL, server_recieve, (void *)sd) == -1) {
+        perror("unable to create new thread.\n");
+        close(sd);
+        exit(1);
+    }
+
+    if (!server_send(sd)) {
+        close(sd);
+        exit(1);
+    }
+}
+
+static bool server_send(long sd) {
     char out_buffer[BUFFER_SIZE];
 
     while (alive) {
-        // TODO: change to protected input
-        scanf("%s", out_buffer);
+        overwrite_stdout();
+        read_input(out_buffer, BUFFER_SIZE);
 
-        if (send(sd, out_buffer, strlen(out_buffer), 0) == -1) {
-            perror("unable to send to server.\n");
+        if (send(sd, out_buffer, strlen(out_buffer) + 1, 0) == -1) {
+            printf("failed to send to server.\n");
             alive = false;
             return false;
         }
@@ -78,7 +61,7 @@ bool server_send(long sd) {
     return true;
 }
 
-void *server_listen(void *_sd) {
+static void *server_recieve(void *_sd) {
     long sd;
     char in_buffer[BUFFER_SIZE];
     size_t bytes_recieved = 0;
@@ -89,9 +72,24 @@ void *server_listen(void *_sd) {
         memset(in_buffer, 0, BUFFER_SIZE);
         bytes_recieved = recv(sd, in_buffer, BUFFER_SIZE - 1, 0);
 
-        if (bytes_recieved > 0)
+        if (bytes_recieved > 0) {
             printf("%s", in_buffer);
+            overwrite_stdout();
+        } else {
+            printf("lost connection with server.\n");
+            alive = false;
+        }
     }
 
     return NULL;
+}
+
+static void read_input(char *buffer, int buffer_size) {
+    fgets(buffer, buffer_size, stdin);
+    buffer[strlen(buffer) - 1] = '\0';
+}
+
+static void overwrite_stdout() {
+    printf("%s", "> ");
+    fflush(stdout);
 }
