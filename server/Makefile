@@ -1,15 +1,28 @@
 CC := gcc
 FLAGS := -g -pthread -Wall
-BUILD := bin
-SOURCE := src
+SRC := src
+OBJ := obj
+SRCS := $(wildcard $(SRC)/*.c)
+OBJS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SRCS))
 
-all: build main 
+BIN_DIR := bin
+BIN := $(BIN_DIR)/main
 
-build:
-	@mkdir -p $(BUILD)
+all: $(BIN)
 
-main: $(SOURCE)/main.c $(SOURCE)/tcp.c $(SOURCE)/user.c $(SOURCE)/chatroom.c
-	$(CC) $(FLAGS) $^ -o $(BUILD)/main
+release: FLAGS := -pthread -Wall -O2
+release: clean
+release: $(BIN)
+
+dirs:
+	mkdir -p bin
+	mkdir -p obj
+
+$(BIN): $(OBJS)
+	$(CC) $(FLAGS) $(OBJS) -o $@
+
+$(OBJ)/%.o: $(SRC)/%.c
+	$(CC) $(FLAGS) -c $< -o $@
 
 clean:
-	rm $(BUILD)/*
+	$(RM) -r $(BIN_DIR)/* $(OBJ)/*

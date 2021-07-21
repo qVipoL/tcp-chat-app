@@ -2,7 +2,7 @@
 #include "include/tcp.h"
 #include "include/user.h"
 
-static bool alive = true;
+static volatile bool alive = true;
 
 static void server_start(long sd);
 static void *handle_client(void *_sd);
@@ -62,7 +62,7 @@ static void server_start(long sd) {
 }
 
 static void *handle_client(void *_sd) {
-    char in_buffer[BUFFER_SIZE], out_buffer[BUFFER_SIZE], tmp_buffer[BUFFER_SIZE];
+    char in_buffer[BUFFER_SIZE], out_buffer[BUFFER_SIZE], tmp_buffer[BUFFER_SIZE - 20];
     size_t bytes_recieved = 0;
     int user_idx, room_idx;
     user *users;
@@ -90,8 +90,8 @@ static void *handle_client(void *_sd) {
             if (!parse_client_input(in_buffer, out_buffer))
                 break;
 
-            strcpy(tmp_buffer, out_buffer);
-            snprintf(out_buffer, BUFFER_SIZE - strlen(users[user_idx].name), "%s : %s\n", users[user_idx].name, tmp_buffer);
+            strncpy(tmp_buffer, out_buffer, BUFFER_SIZE - 20);
+            snprintf(out_buffer, BUFFER_SIZE, "%s : %s\n", users[user_idx].name, tmp_buffer);
 
             chatroom_send(user_idx, room_idx, out_buffer);
         } else {

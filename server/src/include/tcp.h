@@ -15,8 +15,7 @@ typedef struct sockaddr_in sa_in;
 typedef struct sockaddr sa;
 
 #define BUFFER_SIZE 256
-#define PORT 8091
-#define ADDRESS "127.0.0.1"
+#define PORT 8093
 #define MAX_PENDING 10
 
 long socket_init();

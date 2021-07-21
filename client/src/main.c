@@ -1,6 +1,6 @@
 #include "include/tcp.h"
 
-static bool alive = true;
+static volatile bool alive = true;
 
 static void client_start(long sd);
 static bool server_send(long sd);
@@ -85,7 +85,13 @@ static void *server_recieve(void *_sd) {
 }
 
 static void read_input(char *buffer, int buffer_size) {
-    fgets(buffer, buffer_size, stdin);
+    char *tmp = fgets(buffer, buffer_size, stdin);
+
+    if (!tmp) {
+        perror("invalid input.\n");
+        exit(1);
+    }
+
     buffer[strlen(buffer) - 1] = '\0';
 }
 

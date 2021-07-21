@@ -1,6 +1,6 @@
 all:
-	make -C client
-	make -C server
+	make release -C client
+	make release -C server
 
 clean:
 	make clean -C client
