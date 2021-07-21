@@ -8,11 +8,11 @@ OBJS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SRCS))
 BIN_DIR := bin
 BIN := $(BIN_DIR)/main
 
-all: $(BIN)
+all: dirs $(BIN)
 
 release: FLAGS := -pthread -Wall -O2
 release: clean
-release: $(BIN)
+release: dirs $(BIN)
 
 dirs:
 	mkdir -p bin
