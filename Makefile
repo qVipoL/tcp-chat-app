@@ -7,5 +7,5 @@ clean:
 	make clean -C server
 
 run:
-	gnome-terminal -- "./server/bin/main" -t "Server"
-	gnome-terminal -- "./client/bin/main" -t "Client 1"
+	gnome-terminal -- "./server/bin/server" -t "Server"
+	gnome-terminal -- "./client/bin/client" -t "Client 1"

@@ -1,7 +1,7 @@
-#include "include/chatroom.h"
+#include "../include/chatroom.h"
 
-#include "include/tcp.h"
-#include "include/user.h"
+#include "../../tcp/include/tcp.h"
+#include "../include/user.h"
 
 static chatroom rooms[MAX_ROOMS];
 
@@ -40,7 +40,7 @@ int chatroom_join(int user_idx, const char *room_name, char *error_buffer, int e
     }
 
     if (strlen(room_name) < MIN_ROOMNAME_LENGTH) {
-        snprintf(error_buffer, error_buffer_size, "room name too too short (min: %d chars).\n", MIN_NAME_LENGTH);
+        snprintf(error_buffer, error_buffer_size, "room name too too short (min: %d chars).\n", MIN_ROOMNAME_LENGTH);
 
         return INVALID_ROOM;
     }

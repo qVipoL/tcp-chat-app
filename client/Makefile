@@ -1,12 +1,18 @@
-CC := gcc
-FLAGS := -g -pthread -Wall
-SRC := src
-OBJ := obj
-SRCS := $(wildcard $(SRC)/*.c)
-OBJS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SRCS))
+CC :=gcc
+FLAGS :=-g -pthread -Wall
+SRC :=src
+OBJ :=obj
+SRCS :=$(wildcard $(SRC)/*.c)
+OBJS :=$(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SRCS))
+
+TCP := ../tcp
+TCP_SRC := $(TCP)/$(SRC)
+TCP_OBJ := $(TCP)/$(OBJ)
+TCP_LIB := $(wildcard $(TCP_SRC)/*.c)
+TCP_OBJS := $(patsubst $(TCP_SRC)/%.c, $(TCP_OBJ)/%.o, $(TCP_LIB))
 
 BIN_DIR := bin
-BIN := $(BIN_DIR)/main
+BIN := $(BIN_DIR)/client
 
 all: dirs $(BIN)
 
@@ -15,14 +21,20 @@ release: clean
 release: dirs $(BIN)
 
 dirs:
-	mkdir -p bin
-	mkdir -p obj
+	mkdir -p $(BIN_DIR)
+	mkdir -p $(OBJ)
+	mkdir -p $(TCP_OBJ)
 
-$(BIN): $(OBJS)
-	$(CC) $(FLAGS) $(OBJS) -o $@
+$(BIN): $(OBJS) $(TCP_OBJS)
+	$(CC) $(FLAGS) $(OBJS) $(TCP_OBJS) -o $@
 
+# compile project objs
 $(OBJ)/%.o: $(SRC)/%.c
 	$(CC) $(FLAGS) -c $< -o $@
 
+# compile tcp lib ojbs
+$(TCP_OBJ)/%.o: $(TCP_SRC)/%.c
+	$(CC) $(FLAGS) -c $< -o $@
+
 clean:
-	$(RM) -r $(BIN_DIR)/* $(OBJ)/*
+	$(RM) -r $(BIN_DIR)/* $(OBJ)/* $(TCP_OBJ)/*

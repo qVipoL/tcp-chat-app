@@ -16,11 +16,15 @@ typedef struct sockaddr sa;
 
 #define BUFFER_SIZE 256
 #define PORT 8093
+#define ADDRESS "127.0.0.1"
 #define MAX_PENDING 10
 
 long socket_init();
 void server_set_addr(sa_in *addr, int port);
 void server_socket_bind(long sd, sa_in addr);
 void server_socket_listen(long sd);
+
+void client_set_addr(sa_in *addr, char *ip, int port);
+void client_socket_connect(long sd, sa_in addr);
 
 #endif
