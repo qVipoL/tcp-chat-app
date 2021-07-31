@@ -21,6 +21,7 @@ typedef struct
 } chatroom;
 
 void chatroom_init();
+int chatroom_user_find(int user_idx);
 int chatroom_join(int user_idx, const char *room_name, char *error_buffer, int error_buffer_size);
 void chatroom_leave(int user_idx, int room_idx);
 void chatroom_send(int user_idx, int room_idx, const char *msg);

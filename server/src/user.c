@@ -14,6 +14,17 @@ void user_init() {
     }
 }
 
+int user_find(long sd) {
+    int idx;
+
+    for (idx = 0; idx < MAX_USERS; idx++) {
+        if (users[idx].sd == sd)
+            return idx;
+    }
+
+    return -1;
+}
+
 int user_login(const char *client_name, int sd, char *error_buffer, int error_buffer_size) {
     int idx, name_length;
 

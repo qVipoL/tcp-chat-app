@@ -19,6 +19,7 @@ typedef struct
 } user;
 
 void user_init();
+int user_find(long sd);
 int user_login(const char *client_name, int sd, char *error_buffer, int error_buffer_size);
 void user_logout(int user_idx);
 void user_remove_connections(int sd);

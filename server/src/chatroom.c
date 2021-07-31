@@ -19,6 +19,17 @@ void chatroom_init() {
     }
 }
 
+int chatroom_user_find(int user_idx) {
+    int idx, jdx;
+
+    for (idx = 0; idx < MAX_ROOMS; idx++)
+        for (jdx = 0; jdx < MAX_USERS_PER_ROOM; jdx++)
+            if (rooms[idx].users_idxs[jdx] == user_idx)
+                return idx;
+
+    return -1;
+}
+
 int chatroom_join(int user_idx, const char *room_name, char *error_buffer, int error_buffer_size) {
     int idx, jdx;
 
